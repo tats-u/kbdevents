@@ -23,15 +23,13 @@ jobs:
         with:
           # latest lts
           node-version: "lts/*"
-      - run: yarn install
       - name: Cache (NPM)
         uses: actions/cache@v3
         with:
           path: |
             **/node_modules
           key: ${{ runner.os }}-build-${{ hashFiles('**/yarn.lock') }}
-      - name: Build
-        run: yarn build
+      - run: yarn install
       - name: Cache (Next.js)
         uses: actions/cache@v3
         with:
@@ -44,6 +42,8 @@ jobs:
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+      - name: Build
+        run: yarn build
       - name: Fix permissions
         run: |
           chmod -c -R +rX "out/" | while read line; do
