@@ -1,0 +1,52 @@
+name: Build & upload
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**"
+      - "!*.md"
+      - "!.vscode/**"
+      - "!.git*"
+      - "!.editorconfig"
+      - ".github/**"
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # latest lts
+          node-version: "lts/*"
+      - run: yarn install
+      - uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-build-${{ hashFiles('**/yarn.lock') }}
+      - name: Build
+        run: yarn build
+      - name: Upload
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: out
+        if: github.event_name == 'push'
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        uses: actions/deploy-pages@v4
+        id: deployment
+    if: github.event_name == 'push'
