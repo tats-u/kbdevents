@@ -51,7 +51,7 @@ jobs:
           done
         if: github.event_name == 'push'
       - name: Upload
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: out
         if: github.event_name == 'push'
