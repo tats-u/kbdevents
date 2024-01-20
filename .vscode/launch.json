@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "name": "yarn run dev",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ]
+    },
+    {
+      "name": "Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Chrome Set",
+      "configurations": ["yarn run dev", "Launch Chrome"]
+    }
+  ]
+}

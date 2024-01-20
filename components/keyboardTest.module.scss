@@ -1,0 +1,92 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 25lh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.2lh;
+}
+
+.listItem {
+  padding: 0.4lh;
+  display: block;
+  background-color: #0ae3;
+  @media (prefers-color-scheme: dark) {
+    background-color: #0ae6;
+  }
+  border-radius: 0.5ch;
+}
+
+.otherWhenComposing {
+  color: #444;
+  background-color: #6893;
+  @media (prefers-color-scheme: dark) {
+    color: #aaa;
+  }
+}
+
+.notIntended {
+  color: #c00;
+  @media (prefers-color-scheme: dark) {
+    color: #f33;
+  }
+}
+
+%compositionStartEnd {
+  border-inline: 1px solid;
+}
+
+.compositionStart {
+  @extend %compositionStartEnd;
+  border-block-end: 1px solid;
+}
+
+.compositionEnd {
+  @extend %compositionStartEnd;
+  border-block-start: 1px solid;
+}
+
+.compositionUpdate {
+  @extend .otherWhenComposing;
+}
+
+.eventName {
+  border-radius: 0.2ch;
+}
+
+.text {
+  color: #d60;
+  @media (prefers-color-scheme: dark) {
+    color: #f86;
+  }
+  &::before,
+  &::after {
+    content: '"';
+  }
+}
+
+.count {
+  margin-inline-start: 1ch;
+  padding: 0.4lh;
+  border-radius: 0.9lh;
+  color: #fff;
+  background-color: #c33;
+  font-size: 60%;
+}
+
+.form {
+  margin-block: 1lh;
+  display: flex;
+  flex-direction: row;
+  column-gap: 1ch;
+
+  input[type="text"] {
+    padding: 0.4lh;
+    flex: 1;
+  }
+  button {
+    padding: 0.4lh;
+  }
+}
