@@ -104,7 +104,9 @@ function KeyDownEventEntry({
     <li
       className={clsx(
         styles.listItem,
-        isComposingEvent !== isComposingState ? styles.notIntended : styles.otherWhenComposing
+        isComposingEvent !== isComposingState
+          ? styles.notIntended
+          : styles.otherWhenComposing
       )}
     >
       <EventName name={name} /> <kbd>{text}</kbd>
@@ -137,67 +139,68 @@ export function KeyboardTest() {
   return (
     <div>
       <form className={styles.form}>
-
-      <input
-        type="text"
-        onChange={(e) => {
-          updateQueue(
-            getUpdatedQueueWithLimit(queue, {
-              name: "change",
-              text: e.target.value,
-              isComposingState: isComposing,
-              id: nextId,
-            })
-          );
-          updateNextId();
-        }}
-        onKeyDown={(e) => {
-          updateQueue(
-            getUpdatedQueueWithLimit(queue, {
-              name: "keyDown",
-              isComposingEvent: e.nativeEvent.isComposing,
-              isComposingState: isComposing,
-              text: e.key,
-              id: nextId,
-            })
-          );
-          updateNextId();
-        }}
-        onCompositionStart={(e) => {
-          setIsComposing(true);
-          updateQueue(
-            getUpdatedQueueWithLimit(queue, {
-              name: "compositionStart",
-              text: e.data,
-              id: nextId,
-            })
-          );
-          updateNextId();
-        }}
-        onCompositionUpdate={(e) => {
-          updateQueue(
-            getUpdatedQueueWithLimit(queue, {
-              name: "compositionUpdate",
-              text: e.data,
-              id: nextId,
-            })
-          );
-          updateNextId();
-        }}
-        onCompositionEnd={(e) => {
-          setIsComposing(false);
-          updateQueue(
-            getUpdatedQueueWithLimit(queue, {
-              name: "compositionEnd",
-              text: e.data,
-              id: nextId,
-            })
-          );
-          updateNextId();
-        }}
-      />
-      <button type="reset">Clear Text</button>
-      <button onClick={() => updateQueue([])}>Clear Log</button>
+        <input
+          type="text"
+          onChange={(e) => {
+            updateQueue(
+              getUpdatedQueueWithLimit(queue, {
+                name: "change",
+                text: e.target.value,
+                isComposingState: isComposing,
+                id: nextId,
+              })
+            );
+            updateNextId();
+          }}
+          onKeyDown={(e) => {
+            updateQueue(
+              getUpdatedQueueWithLimit(queue, {
+                name: "keyDown",
+                isComposingEvent: e.nativeEvent.isComposing,
+                isComposingState: isComposing,
+                text: e.key,
+                id: nextId,
+              })
+            );
+            updateNextId();
+          }}
+          onCompositionStart={(e) => {
+            setIsComposing(true);
+            updateQueue(
+              getUpdatedQueueWithLimit(queue, {
+                name: "compositionStart",
+                text: e.data,
+                id: nextId,
+              })
+            );
+            updateNextId();
+          }}
+          onCompositionUpdate={(e) => {
+            updateQueue(
+              getUpdatedQueueWithLimit(queue, {
+                name: "compositionUpdate",
+                text: e.data,
+                id: nextId,
+              })
+            );
+            updateNextId();
+          }}
+          onCompositionEnd={(e) => {
+            setIsComposing(false);
+            updateQueue(
+              getUpdatedQueueWithLimit(queue, {
+                name: "compositionEnd",
+                text: e.data,
+                id: nextId,
+              })
+            );
+            updateNextId();
+          }}
+        />
+        <div>
+          <button type="reset">Clear Text</button>
+          <button onClick={() => updateQueue([])}>Clear Log</button>
+        </div>
       </form>
       <ul className={styles.list}>
         {queue.map((e) => (

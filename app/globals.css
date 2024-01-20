@@ -88,7 +88,7 @@ body {
 
 @media (width <= 768px) {
   body {
-    padding-inline: 1ch;
+    padding-inline: 2ch;
   }
 }
 

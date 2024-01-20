@@ -80,7 +80,14 @@
   margin-block: 1lh;
   display: flex;
   flex-direction: row;
-  column-gap: 1ch;
+  align-content: center;
+  justify-content: flex-start;
+  gap: 1ch;
+  width: 100%;
+
+  @media (width <= 768px) {
+    flex-direction: column;
+  }
 
   input[type="text"] {
     padding: 0.4lh;
@@ -88,5 +95,13 @@
   }
   button {
     padding: 0.4lh;
+  }
+
+  div {
+    display: flex;
+    gap: 1ch;
+    @media (width <= 768px) {
+      justify-content: flex-end;
+    }
   }
 }
