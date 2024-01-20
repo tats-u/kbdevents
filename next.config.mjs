@@ -1,6 +1,7 @@
 const prefixPath = ((repoName) => {
   // Not GitHub Actions
   if (!repoName) return undefined;
+  console.log(`Repository name: ${repoName}`);
   return repoName.replace(/^[^\/]+/, "");
 })(process.env.GITHUB_REPOSITORY);
 
