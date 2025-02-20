@@ -12,6 +12,15 @@ export default function Home() {
           This page allows you to test keyboard events including IME-related
           ones.
         </p>
+        <p>
+          Note:{" "}
+          <a
+            href="https://react.dev/reference/react-dom/components/input#props"
+            target="_blank"
+          >
+            React uses the native onInput event to implement its onChange event.
+          </a>
+        </p>
         <KeyboardTest />
       </main>
       <footer>

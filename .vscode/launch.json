@@ -3,22 +3,17 @@
     {
       "name": "yarn run dev",
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "type": "node",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": [
-        "run",
-        "dev"
-      ]
+      "runtimeArgs": ["run", "dev"]
     },
     {
       "name": "Launch Chrome",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}",
+      "webRoot": "${workspaceFolder}"
     }
   ],
   "compounds": [

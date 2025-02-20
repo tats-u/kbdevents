@@ -67,6 +67,10 @@
   }
 }
 
+.null {
+  opacity: 0.5;
+}
+
 .count {
   margin-inline-start: 1ch;
   padding: 0.4lh;
@@ -102,6 +106,35 @@
     gap: 1ch;
     @media (width <= 768px) {
       justify-content: flex-end;
+    }
+  }
+}
+
+.togglesContainer {
+  display: flex;
+  gap: 1ch;
+  margin-block: 1lh;
+
+  button {
+    padding: 0.4lh;
+  }
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4ch;
+    cursor: pointer;
+    border-radius: 0.2lh;
+    padding: 0.4lh;
+
+    input[type="checkbox"] {
+      display: none;
+    }
+
+    background-color: #6666;
+
+    &:has(input[type="checkbox"]:checked) {
+      background-color: rgba(24, 133, 235, 0.462);
     }
   }
 }
