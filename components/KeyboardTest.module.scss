@@ -13,10 +13,10 @@
   padding: 0.4lh;
   display: block;
   background-color: #0ae3;
+  border-radius: 0.5ch;
   @media (prefers-color-scheme: dark) {
     background-color: #0ae6;
   }
-  border-radius: 0.5ch;
 }
 
 .otherWhenComposing {
@@ -114,6 +114,7 @@
   display: flex;
   gap: 1ch;
   margin-block: 1lh;
+  flex-wrap: wrap;
 
   button {
     padding: 0.4lh;

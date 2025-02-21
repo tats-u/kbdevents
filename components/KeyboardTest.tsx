@@ -207,6 +207,101 @@ export function KeyboardTest() {
   );
   return (
     <div>
+      <div className={styles.togglesContainer}>
+        <label htmlFor="checkbox-change">
+          <input
+            id="checkbox-change"
+            type="checkbox"
+            checked={watching.change}
+            onChange={(e) => {
+              setWatching(["change", e.target.checked]);
+            }}
+          />
+          change
+        </label>
+        <label htmlFor="checkbox-keyDown">
+          <input
+            id="checkbox-keyDown"
+            type="checkbox"
+            checked={watching.keyDown}
+            onChange={(e) => {
+              setWatching(["keyDown", e.target.checked]);
+            }}
+          />
+          keyDown
+        </label>
+        <label htmlFor="checkbox-keyUp">
+          <input
+            id="checkbox-keyUp"
+            type="checkbox"
+            checked={watching.keyUp}
+            onChange={(e) => {
+              setWatching(["keyUp", e.target.checked]);
+            }}
+          />
+          keyUp
+        </label>
+        <label htmlFor="checkbox-composition-start">
+          <input
+            id="checkbox-composition-start"
+            type="checkbox"
+            checked={watching.compositionStart}
+            onChange={(e) => {
+              setWatching(["compositionStart", e.target.checked]);
+            }}
+          />
+          compositionStart
+        </label>
+        <label htmlFor="checkbox-composition-update">
+          <input
+            id="checkbox-composition-update"
+            type="checkbox"
+            checked={watching.compositionUpdate}
+            onChange={(e) => {
+              setWatching(["compositionUpdate", e.target.checked]);
+            }}
+          />
+          compositionUpdate
+        </label>
+        <label htmlFor="checkbox-composition-end">
+          <input
+            id="checkbox-composition-end"
+            type="checkbox"
+            checked={watching.compositionEnd}
+            onChange={(e) => {
+              setWatching(["compositionEnd", e.target.checked]);
+            }}
+          />
+          compositionEnd
+        </label>
+        <label htmlFor="checkbox-input">
+          <input
+            id="checkbox-input"
+            type="checkbox"
+            checked={watching.input}
+            onChange={(e) => {
+              setWatching(["input", e.target.checked]);
+            }}
+          />
+          input
+        </label>
+        <button
+          type="button"
+          onClick={() => {
+            setWatching(["all", true]);
+          }}
+        >
+          Watch All
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setWatching(["all", false]);
+          }}
+        >
+          Unwatch All
+        </button>
+      </div>
       <form className={styles.form}>
         <input
           type="text"
@@ -324,101 +419,6 @@ export function KeyboardTest() {
           <button onClick={() => updateQueue([])}>Clear Log</button>
         </div>
       </form>
-      <div className={styles.togglesContainer}>
-        <label htmlFor="checkbox-change">
-          <input
-            id="checkbox-change"
-            type="checkbox"
-            checked={watching.change}
-            onChange={(e) => {
-              setWatching(["change", e.target.checked]);
-            }}
-          />
-          change
-        </label>
-        <label htmlFor="checkbox-keyDown">
-          <input
-            id="checkbox-keyDown"
-            type="checkbox"
-            checked={watching.keyDown}
-            onChange={(e) => {
-              setWatching(["keyDown", e.target.checked]);
-            }}
-          />
-          keyDown
-        </label>
-        <label htmlFor="checkbox-keyUp">
-          <input
-            id="checkbox-keyUp"
-            type="checkbox"
-            checked={watching.keyUp}
-            onChange={(e) => {
-              setWatching(["keyUp", e.target.checked]);
-            }}
-          />
-          keyUp
-        </label>
-        <label htmlFor="checkbox-composition-start">
-          <input
-            id="checkbox-composition-start"
-            type="checkbox"
-            checked={watching.compositionStart}
-            onChange={(e) => {
-              setWatching(["compositionStart", e.target.checked]);
-            }}
-          />
-          compositionStart
-        </label>
-        <label htmlFor="checkbox-composition-update">
-          <input
-            id="checkbox-composition-update"
-            type="checkbox"
-            checked={watching.compositionUpdate}
-            onChange={(e) => {
-              setWatching(["compositionUpdate", e.target.checked]);
-            }}
-          />
-          compositionUpdate
-        </label>
-        <label htmlFor="checkbox-composition-end">
-          <input
-            id="checkbox-composition-end"
-            type="checkbox"
-            checked={watching.compositionEnd}
-            onChange={(e) => {
-              setWatching(["compositionEnd", e.target.checked]);
-            }}
-          />
-          compositionEnd
-        </label>
-        <label htmlFor="checkbox-input">
-          <input
-            id="checkbox-input"
-            type="checkbox"
-            checked={watching.input}
-            onChange={(e) => {
-              setWatching(["input", e.target.checked]);
-            }}
-          />
-          input
-        </label>
-        <button
-          type="button"
-          onClick={() => {
-            setWatching(["all", true]);
-          }}
-        >
-          Watch All
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setWatching(["all", false]);
-          }}
-        >
-          Unwatch All
-        </button>
-      </div>
       <ul className={styles.list}>
         {queue.map((e) => (
           <KeyboardEvent key={e.id} state={e} />
