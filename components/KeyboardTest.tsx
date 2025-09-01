@@ -335,6 +335,9 @@ export function KeyboardTest() {
                     }),
                   );
                   updateNextId();
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
                 }
               : undefined
           }
