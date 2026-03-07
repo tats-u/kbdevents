@@ -202,7 +202,7 @@ export function KeyboardTest() {
   );
 
   const [nextId, updateNextId] = useReducer(
-    (currentId, _?: undefined) => (currentId + 1) & 0xffff,
+    (currentId) => (currentId + 1) & 0xffff,
     0,
   );
   return (
@@ -307,12 +307,11 @@ export function KeyboardTest() {
           type="text"
           onChange={
             watching.change
-              ? (e) => {
-                  const { isComposing, inputType, data } =
-                    e.nativeEvent as InputEvent;
-                  updateQueue(
-                    getUpdatedQueueWithLimit(queue, {
-                      name: "change",
+                ? (e) => {
+                    const { isComposing, inputType } = e.nativeEvent as InputEvent;
+                    updateQueue(
+                      getUpdatedQueueWithLimit(queue, {
+                        name: "change",
                       text: e.target.value,
                       isComposingEvent: isComposing,
                       type: inputType,
