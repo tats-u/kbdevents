@@ -308,7 +308,8 @@ export function KeyboardTest() {
           onChange={
             watching.change
               ? (e) => {
-                  const { isComposing, inputType } = e.nativeEvent as InputEvent;
+                  const { isComposing, inputType } =
+                    e.nativeEvent as InputEvent;
                   updateQueue(
                     getUpdatedQueueWithLimit(queue, {
                       name: "change",
