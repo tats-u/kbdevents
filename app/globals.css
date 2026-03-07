@@ -83,6 +83,7 @@
 body {
   padding-block: 2rem;
   padding-inline: 6rem;
+  font-family: system-ui, sans-serif;
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-end-rgb));
 }
