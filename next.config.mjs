@@ -8,6 +8,9 @@ const prefixPath = ((repoName) => {
 const nextConfig = {
   output: "export",
   basePath: prefixPath,
+  experimental: {
+    turbopackUseSystemTlsCerts: true,
+  },
 };
 
 export default nextConfig;
