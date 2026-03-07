@@ -139,3 +139,32 @@
     }
   }
 }
+
+.urlIndicator {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  flex-wrap: wrap;
+  padding: 0.5lh 1ch;
+  border-radius: 0.5ch;
+  background-color: rgba(24, 133, 235, 0.15);
+  border: 1px solid rgba(24, 133, 235, 0.4);
+  font-size: 0.9em;
+  @media (prefers-color-scheme: dark) {
+    background-color: rgba(24, 133, 235, 0.25);
+    border-color: rgba(24, 133, 235, 0.5);
+  }
+}
+
+.saveButton {
+  padding: 0.3lh 1ch;
+  border-radius: 0.3lh;
+  border: none;
+  background-color: rgba(24, 133, 235, 0.8);
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  &:hover {
+    background-color: rgba(24, 133, 235, 1);
+  }
+}

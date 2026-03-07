@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import styles from "./KeyboardTest.module.scss";
 import clsx from "clsx";
 
@@ -169,37 +169,182 @@ type WatchingState = {
   readonly [name in RegisteredKeyboardEntry["name"]]: boolean;
 };
 
+const WATCHING_KEYS: ReadonlyArray<keyof WatchingState> = [
+  "change",
+  "keyDown",
+  "keyUp",
+  "compositionStart",
+  "compositionUpdate",
+  "compositionEnd",
+  "input",
+];
+
+const ALL_ON_STATE: WatchingState = {
+  change: true,
+  keyDown: true,
+  keyUp: true,
+  compositionStart: true,
+  compositionUpdate: true,
+  compositionEnd: true,
+  input: true,
+};
+
+const STORAGE_KEY = "kbdevents-watching";
+
+function saveToLocalStorage(state: WatchingState): void {
+  try {
+    const enabledKeys = WATCHING_KEYS.filter((k) => state[k]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(enabledKeys));
+  } catch {
+    // localStorage may be unavailable
+  }
+}
+
+function loadFromLocalStorage(): WatchingState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === null) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    const state: Record<string, boolean> = {};
+    for (const key of WATCHING_KEYS) {
+      state[key] = parsed.includes(key);
+    }
+    return state as WatchingState;
+  } catch {
+    return null;
+  }
+}
+
+function parseEventsFromURL(): WatchingState | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const eventsParam = params.get("events");
+  if (eventsParam === null) return null;
+  const requested = eventsParam.split(",").map((s) => s.trim());
+  const state = {} as Record<string, boolean>;
+  for (const key of WATCHING_KEYS) {
+    state[key] = requested.includes(key);
+  }
+  return state as WatchingState;
+}
+
+function watchingStatesEqual(a: WatchingState, b: WatchingState): boolean {
+  return WATCHING_KEYS.every((k) => a[k] === b[k]);
+}
+
+type SourceMode = "url" | "storage";
+
+function watchingReducer(
+  current: WatchingState,
+  action: [keyof WatchingState | "all", boolean] | ["reset", WatchingState],
+): WatchingState {
+  const [name, value] = action;
+  if (name === "reset") {
+    return value as WatchingState;
+  }
+  if (name === "all") {
+    return {
+      change: value as boolean,
+      keyDown: value as boolean,
+      keyUp: value as boolean,
+      compositionStart: value as boolean,
+      compositionUpdate: value as boolean,
+      compositionEnd: value as boolean,
+      input: value as boolean,
+    };
+  }
+  return { ...current, [name]: value as boolean };
+}
+
 export function KeyboardTest() {
   const [queue, updateQueue] = useState<RegisteredKeyboardEntry[]>([]);
-  // const [isComposing, setIsComposing] = useState(false);
-  const [watching, setWatching] = useReducer(
+  const [watching, setWatching] = useReducer(watchingReducer, ALL_ON_STATE);
+  const [userChanged, setUserChanged] = useState(false);
+  const [initInfo, setInitInfo] = useReducer(
     (
-      current: WatchingState,
-      [name, value]: [keyof WatchingState | "all", boolean],
-    ) => {
-      if (name === "all") {
-        return {
-          change: value,
-          keyDown: value,
-          keyUp: value,
-          compositionStart: value,
-          compositionUpdate: value,
-          compositionEnd: value,
-          input: value,
-        };
-      }
-      return { ...current, [name]: value };
-    },
-    {
-      change: true,
-      keyDown: true,
-      keyUp: true,
-      compositionStart: true,
-      compositionUpdate: true,
-      compositionEnd: true,
-      input: true,
-    },
+      _current: { initialized: boolean; sourceMode: SourceMode },
+      action: { initialized: boolean; sourceMode: SourceMode },
+    ) => action,
+    { initialized: false, sourceMode: "storage" },
   );
+  const initialUrlStateRef = useRef<WatchingState | null>(null);
+  // Ref for visibilitychange handler (needs latest state without re-registering)
+  const watchingRef = useRef(watching);
+  const sourceModeRef = useRef<SourceMode>("storage");
+
+  // Sync watching ref in effect (React 19 requirement)
+  useEffect(() => {
+    watchingRef.current = watching;
+  }, [watching]);
+
+  // Initialize from URL or Local Storage
+  useEffect(() => {
+    const urlState = parseEventsFromURL();
+    if (urlState) {
+      setWatching(["reset", urlState]);
+      sourceModeRef.current = "url";
+      initialUrlStateRef.current = urlState;
+      setInitInfo({ initialized: true, sourceMode: "url" });
+    } else {
+      const stored = loadFromLocalStorage();
+      if (stored) {
+        setWatching(["reset", stored]);
+      }
+      sourceModeRef.current = "storage";
+      setInitInfo({ initialized: true, sourceMode: "storage" });
+    }
+  }, []);
+
+  // Auto-save for storage mode: visibilitychange + debounced on change
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        if (sourceModeRef.current === "storage") {
+          saveToLocalStorage(watchingRef.current);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (saveTimeoutRef.current !== null) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Wrapper to track user changes and trigger auto-save
+  const handleSetWatching = (
+    action: [keyof WatchingState | "all", boolean],
+  ) => {
+    setWatching(action);
+    if (sourceModeRef.current === "url") {
+      const newState = watchingReducer(watching, action);
+      const urlState = initialUrlStateRef.current;
+      if (urlState && !watchingStatesEqual(newState, urlState)) {
+        setUserChanged(true);
+      } else {
+        setUserChanged(false);
+      }
+    } else {
+      // Debounced save for storage mode
+      if (saveTimeoutRef.current !== null) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(() => {
+        saveToLocalStorage(watchingRef.current);
+        saveTimeoutRef.current = null;
+      }, 1000);
+    }
+  };
+
+  const handleSaveToStorage = () => {
+    saveToLocalStorage(watching);
+    setUserChanged(false);
+  };
 
   const [nextId, updateNextId] = useReducer(
     (currentId) => (currentId + 1) & 0xffff,
@@ -207,6 +352,20 @@ export function KeyboardTest() {
   );
   return (
     <div>
+      {initInfo.initialized && initInfo.sourceMode === "url" && (
+        <div className={styles.urlIndicator}>
+          <span>Showing settings specified by URL</span>
+          {userChanged && (
+            <button
+              type="button"
+              className={styles.saveButton}
+              onClick={handleSaveToStorage}
+            >
+              Save settings
+            </button>
+          )}
+        </div>
+      )}
       <div className={styles.togglesContainer}>
         <label htmlFor="checkbox-change">
           <input
@@ -214,7 +373,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.change}
             onChange={(e) => {
-              setWatching(["change", e.target.checked]);
+              handleSetWatching(["change", e.target.checked]);
             }}
           />
           change
@@ -225,7 +384,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.keyDown}
             onChange={(e) => {
-              setWatching(["keyDown", e.target.checked]);
+              handleSetWatching(["keyDown", e.target.checked]);
             }}
           />
           keyDown
@@ -236,7 +395,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.keyUp}
             onChange={(e) => {
-              setWatching(["keyUp", e.target.checked]);
+              handleSetWatching(["keyUp", e.target.checked]);
             }}
           />
           keyUp
@@ -247,7 +406,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.compositionStart}
             onChange={(e) => {
-              setWatching(["compositionStart", e.target.checked]);
+              handleSetWatching(["compositionStart", e.target.checked]);
             }}
           />
           compositionStart
@@ -258,7 +417,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.compositionUpdate}
             onChange={(e) => {
-              setWatching(["compositionUpdate", e.target.checked]);
+              handleSetWatching(["compositionUpdate", e.target.checked]);
             }}
           />
           compositionUpdate
@@ -269,7 +428,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.compositionEnd}
             onChange={(e) => {
-              setWatching(["compositionEnd", e.target.checked]);
+              handleSetWatching(["compositionEnd", e.target.checked]);
             }}
           />
           compositionEnd
@@ -280,7 +439,7 @@ export function KeyboardTest() {
             type="checkbox"
             checked={watching.input}
             onChange={(e) => {
-              setWatching(["input", e.target.checked]);
+              handleSetWatching(["input", e.target.checked]);
             }}
           />
           input
@@ -288,7 +447,7 @@ export function KeyboardTest() {
         <button
           type="button"
           onClick={() => {
-            setWatching(["all", true]);
+            handleSetWatching(["all", true]);
           }}
         >
           Watch All
@@ -296,7 +455,7 @@ export function KeyboardTest() {
         <button
           type="button"
           onClick={() => {
-            setWatching(["all", false]);
+            handleSetWatching(["all", false]);
           }}
         >
           Unwatch All
