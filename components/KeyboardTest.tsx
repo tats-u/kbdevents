@@ -269,11 +269,12 @@ export function KeyboardTest() {
     { initialized: false, sourceMode: "storage" },
   );
   const initialUrlStateRef = useRef<WatchingState | null>(null);
-  // Ref for visibilitychange handler (needs latest state without re-registering)
+  // Refs for the visibilitychange handler, which is registered once on mount
+  // and needs access to current state without re-registering the listener.
   const watchingRef = useRef(watching);
   const sourceModeRef = useRef<SourceMode>("storage");
 
-  // Sync watching ref in effect (React 19 requirement)
+  // Sync watching ref in effect (React 19 disallows writing ref.current during render)
   useEffect(() => {
     watchingRef.current = watching;
   }, [watching]);
