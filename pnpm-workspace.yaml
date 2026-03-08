@@ -1,3 +1,5 @@
+packages:
+  - .
 minimumReleaseAge: 1440
 trustPolicy: no-downgrade
 trustPolicyIgnoreAfter: 43200
