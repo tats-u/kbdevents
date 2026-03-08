@@ -233,6 +233,32 @@ function watchingStatesEqual(a: WatchingState, b: WatchingState): boolean {
   return WATCHING_KEYS.every((k) => a[k] === b[k]);
 }
 
+function getEventsURL(state: WatchingState): string {
+  const url = new URL(window.location.href);
+  const enabledKeys = WATCHING_KEYS.filter((key) => state[key]);
+  url.search = `?events=${enabledKeys.join(",")}`;
+  return url.toString();
+}
+
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textarea);
+  return copied;
+}
+
 type SourceMode = "url" | "storage";
 
 function watchingReducer(
@@ -261,6 +287,7 @@ export function KeyboardTest() {
   const [queue, updateQueue] = useState<RegisteredKeyboardEntry[]>([]);
   const [watching, setWatching] = useReducer(watchingReducer, ALL_ON_STATE);
   const [userChanged, setUserChanged] = useState(false);
+  const [copyMessage, setCopyMessage] = useState("");
   const [initInfo, setInitInfo] = useReducer(
     (
       _current: { initialized: boolean; sourceMode: SourceMode },
@@ -347,6 +374,15 @@ export function KeyboardTest() {
     setUserChanged(false);
   };
 
+  const handleCopyURL = async () => {
+    try {
+      const copied = await copyTextToClipboard(getEventsURL(watching));
+      setCopyMessage(copied ? "Copied" : "Could not copy");
+    } catch {
+      setCopyMessage("Could not copy");
+    }
+  };
+
   const [nextId, updateNextId] = useReducer(
     (currentId) => (currentId + 1) & 0xffff,
     0,
@@ -356,6 +392,15 @@ export function KeyboardTest() {
       {initInfo.initialized && initInfo.sourceMode === "url" && (
         <div className={styles.urlIndicator}>
           <span>Showing settings specified by URL</span>
+          <button
+            type="button"
+            className={styles.copyButton}
+            onClick={() => {
+              void handleCopyURL();
+            }}
+          >
+            Copy URL
+          </button>
           {userChanged && (
             <button
               type="button"
@@ -365,6 +410,7 @@ export function KeyboardTest() {
               Save settings
             </button>
           )}
+          {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
         </div>
       )}
       <div className={styles.togglesContainer}>

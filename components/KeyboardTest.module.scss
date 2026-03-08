@@ -145,6 +145,7 @@
   align-items: center;
   gap: 1ch;
   flex-wrap: wrap;
+  margin-block-start: 1lh;
   padding: 0.5lh 1ch;
   border-radius: 0.5ch;
   background-color: rgba(24, 133, 235, 0.15);
@@ -167,4 +168,21 @@
   &:hover {
     background-color: rgba(24, 133, 235, 1);
   }
+}
+
+.copyButton {
+  padding: 0.3lh 1ch;
+  border-radius: 0.3lh;
+  border: 1px solid rgba(24, 133, 235, 0.5);
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(24, 133, 235, 0.12);
+  }
+}
+
+.copyMessage {
+  opacity: 0.8;
 }
