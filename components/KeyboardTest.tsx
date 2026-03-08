@@ -241,22 +241,11 @@ function getEventsURL(state: WatchingState): string {
 }
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return true;
+  if (!navigator.clipboard?.writeText) {
+    return false;
   }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "absolute";
-  textarea.style.left = "-9999px";
-  document.body.appendChild(textarea);
-  textarea.select();
-
-  const copied = document.execCommand("copy");
-  document.body.removeChild(textarea);
-  return copied;
+  await navigator.clipboard.writeText(text);
+  return true;
 }
 
 type SourceMode = "url" | "storage";
@@ -305,6 +294,18 @@ export function KeyboardTest() {
   useEffect(() => {
     watchingRef.current = watching;
   }, [watching]);
+
+  useEffect(() => {
+    if (!copyMessage) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setCopyMessage("");
+    }, 2000);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [copyMessage]);
 
   // Initialize from URL or Local Storage
   useEffect(() => {
