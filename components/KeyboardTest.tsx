@@ -234,9 +234,20 @@ function watchingStatesEqual(a: WatchingState, b: WatchingState): boolean {
 }
 
 function getEventsURL(state: WatchingState): string {
-  const url = new URL(window.location.href);
+  const currentURL = new URL(window.location.href);
+  // Keep directory-like routes shareable with a trailing slash, while leaving
+  // static export HTML file paths (e.g. /index.html) unchanged.
+  const isFilePath = /\.html$/.test(currentURL.pathname);
+  const pathname =
+    currentURL.pathname.endsWith("/") || isFilePath
+      ? currentURL.pathname
+      : `${currentURL.pathname}/`;
+  const url = new URL(currentURL.href);
+  url.pathname = pathname;
+  url.search = "";
+  url.hash = "";
   const enabledKeys = WATCHING_KEYS.filter((key) => state[key]);
-  url.search = `?events=${enabledKeys.join(",")}`;
+  url.searchParams.set("events", enabledKeys.join(","));
   return url.toString();
 }
 
