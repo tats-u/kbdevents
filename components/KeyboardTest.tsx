@@ -393,15 +393,6 @@ export function KeyboardTest() {
       {initInfo.initialized && initInfo.sourceMode === "url" && (
         <div className={styles.urlIndicator}>
           <span>Showing settings specified by URL</span>
-          <button
-            type="button"
-            className={styles.copyButton}
-            onClick={() => {
-              void handleCopyURL();
-            }}
-          >
-            Copy URL
-          </button>
           {userChanged && (
             <button
               type="button"
@@ -411,7 +402,6 @@ export function KeyboardTest() {
               Save settings
             </button>
           )}
-          {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
         </div>
       )}
       <div className={styles.togglesContainer}>
@@ -508,6 +498,16 @@ export function KeyboardTest() {
         >
           Unwatch All
         </button>
+        <button
+          type="button"
+          className={styles.copyButton}
+          onClick={() => {
+            void handleCopyURL();
+          }}
+        >
+          Copy URL
+        </button>
+        {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
       </div>
       <form className={styles.form}>
         <input
