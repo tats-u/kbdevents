@@ -518,7 +518,15 @@ export function KeyboardTest() {
         >
           Copy URL
         </button>
-        {copyMessage && <span className={styles.copyMessage}>{copyMessage}</span>}
+        {copyMessage && (
+          <span
+            className={styles.copyMessage}
+            role="status"
+            aria-live="polite"
+          >
+            {copyMessage}
+          </span>
+        )}
       </div>
       <form className={styles.form}>
         <input
